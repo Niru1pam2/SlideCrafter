@@ -51,7 +51,7 @@ export const itemVariants = {
     y: 0,
     opacity: 1,
     transition: {
-      type: "sorting",
+      type: "spring",
       stiffness: 100,
     },
   },
@@ -355,5 +355,27 @@ export const themes: Theme[] = [
     navbarColor: "#18181b",
     sidebarColor: "#09090b",
     type: "dark",
+  },
+];
+
+export const CreatePageCard = [
+  {
+    title: "Use a",
+    highlightedText: "Template",
+    description: "Write a prompt and leave everything else for us to handle",
+    type: "template",
+  },
+  {
+    title: "Generate with",
+    highlightedText: "SlideCraft AI",
+    description: "Write a prompt and leave everything else for us to handle",
+    type: "creative-ai",
+    highlight: true,
+  },
+  {
+    title: "Start from",
+    highlightedText: "Scratch",
+    description: "Write a prompt and leave everything else for us to handle",
+    type: "create-scratch",
   },
 ];

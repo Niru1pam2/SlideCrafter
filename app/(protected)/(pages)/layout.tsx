@@ -27,7 +27,7 @@ export default async function Layout({ children }: Props) {
       />
       <SidebarInset>
         <UpperInfoBar user={checkUser.user} />
-        {children}
+        <div className="p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

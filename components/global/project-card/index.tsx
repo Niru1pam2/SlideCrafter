@@ -16,7 +16,6 @@ type Props = {
   projectId: string;
   title: string;
   createdAt: string;
-  src: string;
   isDelete?: boolean;
   slideData: JsonValue;
   themeName: string;
@@ -26,7 +25,6 @@ export default function ProjectCard({
   createdAt,
   projectId,
   slideData,
-  src,
   title,
   isDelete,
   themeName,
@@ -102,6 +100,7 @@ export default function ProjectCard({
       });
     }
   };
+
   return (
     <motion.div
       variants={itemVariants as Variants}
@@ -110,10 +109,10 @@ export default function ProjectCard({
       }`}
     >
       <div onClick={handleNavigation}>
-        <ThumbnailPreview
+        {/* <ThumbnailPreview
           //   slide={JSON.parse(JSON.stringify(slideData)?.[0])}
           theme={theme}
-        />
+        /> */}
       </div>
 
       <div className="w-full">

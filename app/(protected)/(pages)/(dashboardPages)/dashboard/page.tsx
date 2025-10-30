@@ -1,6 +1,5 @@
 import { getAllProjects } from "@/actions/project";
 import NotFound from "@/components/global/not-found";
-import ProjectCard from "@/components/global/project-card";
 import Projects from "@/components/global/projects";
 
 export default async function DashboardPage() {
@@ -19,7 +18,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <ProjectCard createdAt={"asdasdasd"} />
       {allProjects.projects && allProjects.projects.length > 0 ? (
         <Projects projects={allProjects.projects} />
       ) : (
