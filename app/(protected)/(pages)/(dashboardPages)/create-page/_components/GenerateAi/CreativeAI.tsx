@@ -14,12 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardList from "../Common/CardList";
 import usePromptStore from "@/store/usePromptStore";
 import RecentPrompts from "./RecentPrompts";
 import { toast } from "sonner";
 import { generateCreativePrompt } from "@/actions/gemini";
+import { OutlineCard } from "@/lib/types";
+import { v4 } from "uuid";
+import { createProject } from "@/actions/project";
+import { useSlideStore } from "@/store/useSlideStore";
 
 type Props = {
   onBack: () => void;
@@ -30,9 +34,9 @@ export default function CreativeAI({ onBack }: Props) {
   const [editingCard, setEditingCard] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
   const [noOfCards, setNoOfCards] = useState(0);
   const { prompts, addPrompt } = usePromptStore();
+  const { setProject } = useSlideStore();
 
   const {
     resetOutlines,
@@ -46,14 +50,13 @@ export default function CreativeAI({ onBack }: Props) {
   function resetCards() {
     setEditingCard(null);
     setSelectedCard(null);
-    setEditText("");
-
+    setNoOfCards(0);
     setCurrentAiPrompt("");
     resetOutlines();
   }
 
   async function generateOutline() {
-    if (currentAiPrompt === "") {
+    if (currentAiPrompt.trim() === "") {
       toast.error("Error", {
         description: "Please enter a prompt to generate an outline.",
       });
@@ -61,10 +64,80 @@ export default function CreativeAI({ onBack }: Props) {
     }
 
     setIsGenerating(true);
-    // const res = await generateCreativePrompt(currentAiPrompt)
+    const res = await generateCreativePrompt(currentAiPrompt);
+    if (res.status === 200 && res?.data?.outlines) {
+      const cardsData: OutlineCard[] = [];
+      res.data.outlines.map((outline: string, idx: number) => {
+        const newCard = {
+          id: v4(),
+          title: outline,
+          order: idx + 1,
+        };
+        cardsData.push(newCard);
+      });
+
+      addMultipleOutlines(cardsData);
+      setNoOfCards(cardsData.length);
+      toast.success("Success", {
+        description: "Outlines generated successfully",
+      });
+    } else {
+      toast.error("Error", {
+        description: "Failed to generate outline. Please try again",
+      });
+    }
+
+    setIsGenerating(false);
   }
 
-  function handleGenerate() {}
+  async function handleGenerate() {
+    setIsGenerating(true);
+    if (outlines.length === 0) {
+      toast.error("Error", {
+        description: "Please generate an outline first.",
+      });
+      return;
+    }
+
+    try {
+      const res = await createProject(
+        currentAiPrompt,
+        outlines.slice(0, noOfCards)
+      );
+
+      if (res.status !== 200 || !res.data) {
+        throw new Error("Unable to create project");
+      }
+
+      router.push(`/presentation/${res.data.id}/select-theme`);
+      setProject(res.data);
+
+      addPrompt({
+        id: v4(),
+        title: currentAiPrompt || outlines[0].title,
+        outlines: outlines,
+        createdAt: new Date().toISOString(),
+      });
+
+      toast.success("Success", {
+        description: "Project successfully created",
+      });
+
+      setCurrentAiPrompt("");
+      resetOutlines();
+    } catch (error) {
+      console.log(error);
+      toast.error("Error", {
+        description: "Failed to create project",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  useEffect(() => {
+    setNoOfCards(outlines.length);
+  }, [outlines.length]);
 
   return (
     <motion.div
@@ -74,7 +147,7 @@ export default function CreativeAI({ onBack }: Props) {
       animate="visible"
     >
       <Button onClick={onBack} variant={"link"}>
-        <ArrowLeft />
+        <ArrowLeft className="size-4" />
         Back
       </Button>
 
@@ -84,7 +157,7 @@ export default function CreativeAI({ onBack }: Props) {
       >
         <h1 className="text-4xl font-bold">
           Generate with{" "}
-          <span className="text-4xl font-semibold bg-linear-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
+          <span className="text-4xl font-semibold bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
             SlideCraftAI
           </span>
         </h1>
@@ -96,20 +169,29 @@ export default function CreativeAI({ onBack }: Props) {
       >
         <div className="flex flex-col sm:flex-row justify-between gap-3 items-center rounded-xl bg-primary-10">
           <Input
-            placeholder="Enter Prompt and add to the cards..."
-            className="text-base sm:text-xl border-0 focus-visible:ring-0 shadow-none  grow p-4"
+            placeholder="Enter your prompt to generate presentation outline..."
+            className="text-base sm:text-xl border-0 focus-visible:ring-0 shadow-none grow p-4 dark:bg-transparent"
             required
             value={currentAiPrompt}
             onChange={(e) => setCurrentAiPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter" &&
+                !isGenerating &&
+                currentAiPrompt.trim()
+              ) {
+                generateOutline();
+              }
+            }}
           />
 
           <div className="flex items-center justify-center gap-3">
             <Select
-              value={noOfCards.toString()}
-              onValueChange={(value) => setNoOfCards(parseInt(value))}
+              value={outlines.length > 0 ? outlines.length.toString() : "0"}
+              disabled
             >
               <SelectTrigger className="w-fit gap-2 font-semibold shadow-xl">
-                <SelectValue placeholder="Select number of cards" />
+                <SelectValue placeholder="No cards" />
               </SelectTrigger>
               <SelectContent className="w-fit">
                 {outlines.length === 0 ? (
@@ -138,6 +220,7 @@ export default function CreativeAI({ onBack }: Props) {
               onClick={resetCards}
               size={"icon"}
               aria-label="Reset cards"
+              disabled={isGenerating}
             >
               <RotateCwIcon className="size-4" />
             </Button>
@@ -149,11 +232,11 @@ export default function CreativeAI({ onBack }: Props) {
         <Button
           className="font-medium text-lg flex gap-2 items-center"
           onClick={generateOutline}
-          disabled={isGenerating}
+          disabled={isGenerating || !currentAiPrompt.trim()}
         >
           {isGenerating ? (
             <>
-              <Loader2 className="animate-spin mr-2" />
+              <Loader2 className="animate-spin size-4" />
               Generating...
             </>
           ) : (
@@ -166,17 +249,16 @@ export default function CreativeAI({ onBack }: Props) {
         outlines={outlines}
         addOutline={addOutline}
         addMultipleOutlines={addMultipleOutlines}
-        editText={editText}
+        editText=""
         editingCard={editingCard}
         setSelectedCard={setSelectedCard}
         selectedCard={selectedCard}
         setEditingCard={setEditingCard}
-        setEditText={setEditText}
+        setEditText={() => {}}
         onCardSelect={setSelectedCard}
-        onEditChange={setEditText}
-        onCardDoubleClick={(id, title) => {
+        onEditChange={() => {}}
+        onCardDoubleClick={(id) => {
           setEditingCard(id);
-          setEditText(title);
         }}
       />
 
@@ -188,11 +270,11 @@ export default function CreativeAI({ onBack }: Props) {
         >
           {isGenerating ? (
             <>
-              <Loader2 className="animate-spin mr-2" />
+              <Loader2 className="animate-spin size-4 mr-2" />
               Generating...
             </>
           ) : (
-            "Generate"
+            "Generate PPT"
           )}
         </Button>
       )}
