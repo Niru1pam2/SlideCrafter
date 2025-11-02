@@ -1,3 +1,4 @@
+"use client";
 import { containerVariants } from "@/lib/constants";
 import { Project } from "@/lib/generated/prisma/client";
 import { motion } from "framer-motion";

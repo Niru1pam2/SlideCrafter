@@ -28,7 +28,10 @@ export default function RecentPrompts() {
   }
 
   return (
-    <motion.div variants={containerVariants} className="space-y-4 !mt-20">
+    <motion.div
+      variants={containerVariants}
+      className="space-y-4 mt-20! flex flex-col justify-center items-center"
+    >
       <motion.h2
         variants={itemVariants as Variants}
         className="text-2xl font-semibold text-center"
@@ -38,11 +41,11 @@ export default function RecentPrompts() {
 
       <motion.div
         variants={containerVariants}
-        className="space-y-2 w-full lg:max-w-[80%] mx-auto"
+        className="space-y-2 w-full lg:max-w-[80%]"
       >
         {prompts.map((prompt, idx) => (
           <motion.div key={idx} variants={itemVariants as Variants}>
-            <Card className="p-4 flex items-center justify-between hover:bg-accent/50 transition-colors duration-300">
+            <Card className="p-4 grid grid-cols-2 w-full  hover:bg-accent/50 transition-colors duration-300">
               <div className="max-w-[70%]">
                 <h3 className="font-semibold text-xl line-clamp-1">
                   {prompt?.title}
@@ -51,7 +54,7 @@ export default function RecentPrompts() {
                   {timeAgo(prompt.createdAt)}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 ml-auto">
                 <span className="text-sm bg-linear-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
                   Creative AI
                 </span>

@@ -27,12 +27,9 @@ type Props = {
   outlines: OutlineCard[];
   editingCard: string | null;
   selectedCard: string | null;
-  editText: string;
   addOutline?: (card: OutlineCard) => void;
-  onEditChange: (value: string) => void;
   onCardSelect: (id: string) => void;
   onCardDoubleClick: (id: string, title: string) => void;
-  setEditText: (value: string) => void;
   setEditingCard: (id: string | null) => void;
   setSelectedCard: (id: string | null) => void;
   addMultipleOutlines: (cards: OutlineCard[]) => void;
@@ -40,14 +37,11 @@ type Props = {
 
 export default function CardList({
   addMultipleOutlines,
-
   editingCard,
   onCardDoubleClick,
   onCardSelect,
-
   outlines,
   selectedCard,
-
   setEditingCard,
   setSelectedCard,
 }: Props) {

@@ -70,7 +70,7 @@ export default function CreatePage({ onSelectOption }: Props) {
                 <p
                   className={`text-4xl font-bold ${
                     option.highlight
-                      ? "bg-linear-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent"
+                      ? "bg-linear-to-r  from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent"
                       : "text-primary"
                   }`}
                 >

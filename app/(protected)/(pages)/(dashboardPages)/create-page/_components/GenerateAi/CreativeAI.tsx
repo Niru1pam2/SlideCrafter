@@ -249,14 +249,11 @@ export default function CreativeAI({ onBack }: Props) {
         outlines={outlines}
         addOutline={addOutline}
         addMultipleOutlines={addMultipleOutlines}
-        editText=""
         editingCard={editingCard}
         setSelectedCard={setSelectedCard}
         selectedCard={selectedCard}
         setEditingCard={setEditingCard}
-        setEditText={() => {}}
         onCardSelect={setSelectedCard}
-        onEditChange={() => {}}
         onCardDoubleClick={(id) => {
           setEditingCard(id);
         }}

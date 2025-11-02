@@ -33,7 +33,7 @@ export default function CreateScratch({ onBack }: Props) {
   const [promptText, setPromptText] = useState("");
   const [editingCard, setEditingCard] = useState<string | null>(null);
   const [selectCard, setSelectedCard] = useState<string | null>(null);
-  const { project, setProject } = useSlideStore();
+  const { setProject } = useSlideStore();
 
   function handleBack() {
     resetOutlines();
@@ -163,13 +163,10 @@ export default function CreateScratch({ onBack }: Props) {
         outlines={outlines}
         addOutline={addOutline}
         addMultipleOutlines={addMultipleOutlines}
-        editText=""
-        setEditText={() => {}}
         editingCard={editingCard}
         setEditingCard={setEditingCard}
         selectedCard={selectCard}
         setSelectedCard={setSelectedCard}
-        onEditChange={() => {}}
         onCardDoubleClick={(id) => {
           setEditingCard(id);
         }}
